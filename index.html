@@ -6,22 +6,92 @@
     </head>
 
     <style>
-        h1 {
+        #guide_div {
+            margin: 0 auto;
+            max-width: 700px;
+        }
+
+        #guide_div h2 {
             text-align: center;
         }
 
-        canvas {
+        #masyu_canvas {
             display: block;
             margin: 0 auto;
         }
     </style>
 
-    <body>
-        <h1>Masyu Solver</h1>
-        <canvas width="0" height="0"></canvas>
+    <body style="background-color:#EEEEEE;color:#444444;line-height:1.4">
+        <h1 style="text-align:center;line-height:0.3">Masyu Solver and Guide (WIP)</h1>
+        <p style="text-align:center">by Mathias Ebbensgaard Jensen</p>
+        <canvas id="masyu_canvas" width="0" height="0"></canvas>
+
+        <div id="guide_div">
+            <h2>Introduction</h2>
+            <p>Masyu is a type of pen and paper puzzle where you draw lines in
+            a grid. This webpage features a Masyu solver, as seen above
+            and a guide to understanding Masyu below. Be warned that Masyu is
+            a simple puzzle type and most of the enjoyment comes from figuring
+            out the logic yourself. Reading past this introduction will
+            subject you to what could be considered spoilers for
+            learning Masyu. To play Masyu you can either search for
+            well crafted puzzles set by people or you can go to
+            <a href="https://www.kakuro-online.com/masyu">this website</a>,
+            set the generator's diffculty to easy and grind away.</p>
+
+            <h4>The goal of this website</h4>
+
+            <h4>Masyu Rules</h4>
+            <p>A finished solution will feature a single loop drawn throughout
+            the grid. The loop may not branch. The loop must pass through all
+            cells with white or black circles. Depending on color, the line
+            must pass through the circles subject to some rules. The line may
+            not turn in the cell of a white circle, but must turn on either,
+            or both sides of the circle. The line must turn in a black circle
+            and may not turn on either side of it. A good way to understand
+            these rules is to look at examples, and see how the rules apply to
+            each circle in the finished solution.</p>
+
+            <h4>How to solve Masyu</h4>
+            <p>While it may be nice to think about solving a puzzle by
+            starting somewhere and continously extending the line until it
+            loops back, Masyu is practically solved by drawing a lot of small
+            line segments and slowly connecting them in accordance to the
+            rules. Lone circles rarely imply enough constraints to draw any
+            line segments, but groups of circles, or circles close the edge
+            of the grid often do. A good way to start is looking for circles
+            along the edge of the grid. One thing worth mentioning is that
+            proper Masyu puzzles must have a unique solution, resulting in both
+            some obvious and not so obvious implications.</p>
+
+            <h2>Masyu guide</h2>
+            The following sections
+
+            <h4>Notation(?)</h4>
+
+            <h4>Simple local patterns</h4>
+
+            <h4>Simple global patterns</h4>
+
+            <h4>Tough local patterns</h4>
+
+            <h4>Tough global patterns</h4>
+
+            <h4>The uniqueness property</h4>
+
+            <h4>Error checking</h4>
+
+            <h4>Bifurcation</h4>
+
+            <h2>Solver implementation</h2>
+
+            <h2>Generator implementation</h2>
+
+            <h2>My favorite Masyu puzzle</h2>
+        </div>
     </body>
 
-    <script src="MasyuCanvas.js"></script> <!-- For drawing -->
-    <script src="Masyu.js"></script> <!-- For masyu logic -->
+    <script src="MasyuCanvas.js"></script> <!-- Class for drawing Masyu -->
+    <script src="Masyu.js"></script> <!-- Class for Masyu representation and logic -->
     <script src="main.js"></script> <!-- main loop thingy idk -->
 </html>
