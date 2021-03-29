@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Masyu Solver</title>
+        <title>Masyu Solver and Guide</title>
         <meta charset="UTF-8">
     </head>
 
@@ -21,7 +21,7 @@
             margin-bottom: 5px;
         }
 
-        #guide_div h4 {
+        #guide_div h3 {
             margin-bottom: 5px;
         }
 
@@ -48,7 +48,7 @@
             <a href="https://www.kakuro-online.com/masyu">Kakuro Online's Masyu
             site</a>, set the generator's diffculty to easy and grind away.</p>
 
-            <h4>The goal of this website</h4>
+            <h3>The goal of this website</h3>
             <p>I work on this project mostly for my own sake. I feel I have
             found a lot of logic by playing Masyu myself, and I would like
             to compile it into a guide. The solver is my first experience with
@@ -58,7 +58,7 @@
             Sudoku Solver</a>, and aims to challenge Kakuro Online's claim
             to have the best Masyu site on the internet!</p>
 
-            <h4>Masyu Rules</h4>
+            <h3>Masyu Rules</h3>
             <p>A finished solution will feature a single loop drawn throughout
             the grid. The loop may not branch. The loop must pass through all
             cells with white or black circles. Depending on color, the line
@@ -69,7 +69,7 @@
             these rules is to look at examples, and see how the rules apply to
             each circle in the finished solution.</p>
 
-            <h4>How to solve Masyu</h4>
+            <h3>How to solve Masyu</h3>
             <p>While it may be nice to think about solving a puzzle by
             starting somewhere and continously extending the line until it
             loops back, Masyu is practically solved by drawing a lot of small
@@ -87,31 +87,69 @@
             learn Masyu, but remember that figuring the logic out yourself is
             a big part of enjoying Masyu.</p>
 
-            <h4>Notation</h4>
-            vertices, edges and faces
+            <h3>Notation</h3>
+            <p>While the Masyu puzzle is commonly explained as a grid of cells,
+            I will instead treat it as graph in the mathematical sense, with
+            cervices connected with edges, making faces.</p>
+            <p>Each vertex is either inside or outside the loop, each edge is
+            either connecting the faces with a line or blocking, and each face
+            can be blank, have a white or black circle, and be a part of a
+            line segment.</p>
+            Unfinished
 
-            <h4>Local patterns</h4>
-            Line Axiomatic: line continuation, block continuation, loop stopping
-            White Axiomatic: block next to, line into
-            Black axiomatic: line into, line block, block block
-            Three whites
-            Two blacks
-            Pointing black
-            Squeezed black
+            <h3>Local patterns</h3>
+            <p>Local patterns can be seen as templates that produce logical
+            deductions. The simplest local patterns are those that are
+            directly induced by the rules of Masyu. We will therefore start
+            with these. Note that Masyu is agnostic to rotation and reflection,
+            so all patterns can be applied in all possible rotations and
+            reflections. Many of these will seem trivial. They are intended to
+            be applied in order.</p>
+            <p><b>Resolve line end</b> are single-cell patterns that simply
+            continue the ending of a line if all but one candidate is
+            blocked</p>
+            <p><b>Add blocks</b> are single-cell patterns that block edges
+            around finished lines, as to mark them impossible to branch.</p>
+            <p><b>Resolve dead end</b> is a single-cell pattern that blocks
+            off the last edge if all other edges are blocked.</p>
+            <p><b>Block small loop</b> is a 2-by-1 pattern that produces a
+            block between two line ends if they belong to the same line
+            segment, as they would otherwise be closing a small loop, breaking
+            the puzzle. Importantly, this rule may only be applied if there are
+            other loop segments in the puzzle, as otherwise the big loop in
+            the end cannot be completed.</p>
+            <p><b>White block</b> is a single-cell pattern that resolves
+            whether a white circle goes horizontal or vertical by being next
+            to a blocking edge.</p>
+            <p><b>White line</b> is a single-cell pattern that simply
+            continues a line that has entered a white circle, and blocks the
+            other direction off.</p>
+            <p><b>White turn</b> is a 3-by-1 pattern that blocks the edge
+            that continues the line straight after the white circle, if
+            the line before enters straight.</p>
+            <p><b>Black block</b> are patterns that deny a block circle from
+            continuing straight for two edges, either by lines from the side or
+            blocking edges. This forces the black circle to do so in the
+            opposite direction.</p>
+            <p><b>Black line</b></p>
+            <p><b>Three whites</b></p>
+            <p><b>Two blacks</b></p>
+            <p><b>Pointing black</b></p>
+            <p><b>Pointing whites</b></p>
+            <p><b>Squeezed black</b></p>
+            <p><b>Tunnel</b></p>
+            <p><b>White corner whatever</b></p>
+            <p><b>White opposite</b></p>
 
-            Tunnel
-            White corner whatever
-            Vertex opposite white
+            <h3>Vertex Alignment</h3>
 
-            <h4>Vertex Alignment</h4>
+            <h3>Isolation</h3>
 
-            <h4>Isolation</h4>
+            <h3>Uniqueness</h3>
 
-            <h4>Uniqueness</h4>
+            <h3>Error checking</h3>
 
-            <h4>Error checking</h4>
-
-            <h4>Bifurcation</h4>
+            <h3>Bifurcation</h3>
 
             <h2>Solver implementation</h2>
 
