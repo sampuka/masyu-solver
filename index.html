@@ -6,9 +6,20 @@
     </head>
 
     <style>
-        #masyu_canvas {
-            display: block;
+        #masyu_interface_div {
+            display: table;
             margin: 0px auto;
+            border: 3px solid green;
+        }
+        #masyu_interface_div #masyu_canvas {
+            display: inline-block;
+            margin: 0px auto;
+        }
+
+        #masyu_interface_div #solver_steps_div {
+            display: inline-block;
+            margin: 0px auto;
+            vertical-align: top;
         }
 
         #guide_div {
@@ -33,7 +44,15 @@
     <body style="background-color:#EEEEEE;color:#444444;line-height:1.4">
         <h1 style="text-align:center;line-height:0.3">Masyu Solver and Guide (WIP)</h1>
         <p style="text-align:center">by Mathias Ebbensgaard Jensen</p>
-        <canvas id="masyu_canvas" width="0" height="0"></canvas>
+
+        <div id="masyu_interface_div">
+            <canvas id="masyu_canvas" width="0" height="0"></canvas>
+            <div id="solver_steps_div">
+                <p>Resolve line end</p>
+                <p>Propagate blocks</p>
+                <p>Resolve dead end</p>
+            </div>
+        </div>
 
         <div id="guide_div">
             <h2>Introduction</h2>
@@ -108,7 +127,7 @@
             <p><b>Resolve line end</b> are single-cell patterns that simply
             continue the ending of a line if all but one candidate is
             blocked</p>
-            <p><b>Add blocks</b> are single-cell patterns that block edges
+            <p><b>Propagate blocks</b> are single-cell patterns that block edges
             around finished lines, as to mark them impossible to branch.</p>
             <p><b>Resolve dead end</b> is a single-cell pattern that blocks
             off the last edge if all other edges are blocked.</p>
