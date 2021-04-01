@@ -1,26 +1,47 @@
-let masyu_width = 10;
-let masyu_height = 5;
+"use strict";
 
-let cc = new MasyuCanvas();
-
-cc.set_size(masyu_width, masyu_height);
-cc.draw_grid();
-
-cc.draw_white(1,1);
-cc.draw_black(2,2);
-
-cc.draw_edge_line_right(0,3);
-cc.draw_edge_line_below(1,0);
-cc.draw_edge_line_below(1,1);
-cc.draw_edge_line_below(0,2);
-
-cc.draw_edge_cross_right(0,1);
-cc.draw_edge_cross_right(1,1);
-cc.draw_edge_cross_below(1,2);
-
-let ms = new Masyu(masyu_width, masyu_height);
+let ms = new Masyu(10, 5);
 ms.set_face(2, 2, FaceType.black);
 ms.set_edge_below(1,1, EdgeValue.line);
 ms.set_edge_right(1,1, EdgeValue.cross);
 
+let cc = new MasyuCanvas("solver_masyu_canvas");
 ms.draw_on(cc);
+
+fill_pattern("propagate_blocks", 1, 1, "./..../cc.c", "./..../cccc");
+
+fill_pattern("resolve_line_end_a", 1, 1, "./..../ccl.", "./..../ccll");
+fill_pattern("resolve_line_end_b", 1, 1, "./..../c.lc", "./..../cllc");
+
+fill_pattern("block_branches_a", 1, 1, "./..../..ll", "./..../ccll");
+fill_pattern("block_branches_b", 1, 1, "./..../.ll.", "./..../cllc");
+
+fill_pattern("white_block", 1, 1, "w/..../c...", "w/..../ccll");
+
+fill_pattern("white_line", 1, 1, "w/..../..l.", "w/..../ccll");
+
+function fill_pattern(pattern_name, w, h, fillinfo1, fillinfo2)
+{
+    let div_id = "pattern_" + pattern_name;
+    let div_ele = document.getElementById(div_id);
+
+    let c1 = document.createElement("canvas");
+    let c2 = document.createElement("canvas");
+    c1.id = div_id + "_1";
+    c2.id = div_id + "_2";
+
+    let arrow = document.createElement("p");
+    arrow.text = "->";
+
+    div_ele.appendChild(c1);
+    //div_ele.appendChild(arrow);
+    div_ele.appendChild(c2);
+
+    let cc1 = new MasyuCanvas(c1.id);
+    let ms1 = new Masyu(w, h, fillinfo1);
+    ms1.draw_on(cc1)
+
+    let cc2 = new MasyuCanvas(c2.id);
+    let ms2 = new Masyu(w, h, fillinfo2);
+    ms2.draw_on(cc2)
+}

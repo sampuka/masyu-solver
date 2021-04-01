@@ -39,6 +39,18 @@
         #guide_div p {
             margin-top: 0px;
         }
+
+        .pattern {
+            display: table;
+            margin: 0px auto;
+            border: 3px solid green;
+        }
+
+        .pattern canvas {
+            display: inline-block;
+            vertical-align: top;
+            margin: 0px auto;
+        }
     </style>
 
     <body style="background-color:#EEEEEE;color:#444444;line-height:1.4">
@@ -46,7 +58,7 @@
         <p style="text-align:center">by Mathias Ebbensgaard Jensen</p>
 
         <div id="masyu_interface_div">
-            <canvas id="masyu_canvas" width="0" height="0"></canvas>
+            <canvas id="solver_masyu_canvas" width="0" height="0"></canvas>
             <div id="solver_steps_div">
                 <p>Resolve line end</p>
                 <p>Propagate blocks</p>
@@ -124,32 +136,48 @@
             so all patterns can be applied in all possible rotations and
             reflections. Many of these will seem trivial. They are intended to
             be applied in order.</p>
+
+            <p><b>Propagate blocks</b> is a single-cell pattern that blocks
+            off the last edge if all other edges are blocked.</p>
+            <div class="pattern" id="pattern_propagate_blocks"></div>
+
             <p><b>Resolve line end</b> are single-cell patterns that simply
             continue the ending of a line if all but one candidate is
             blocked</p>
-            <p><b>Propagate blocks</b> are single-cell patterns that block edges
+            <div class="pattern" id="pattern_resolve_line_end_a"></div>
+            <div class="pattern" id="pattern_resolve_line_end_b"></div>
+
+            <p><b>Block branches</b> are single-cell patterns that block edges
             around finished lines, as to mark them impossible to branch.</p>
-            <p><b>Resolve dead end</b> is a single-cell pattern that blocks
-            off the last edge if all other edges are blocked.</p>
+            <div class="pattern" id="pattern_block_branches_a"></div>
+            <div class="pattern" id="pattern_block_branches_b"></div>
+
             <p><b>Block small loop</b> is a 2-by-1 pattern that produces a
             block between two line ends if they belong to the same line
             segment, as they would otherwise be closing a small loop, breaking
             the puzzle. Importantly, this rule may only be applied if there are
             other loop segments in the puzzle, as otherwise the big loop in
             the end cannot be completed.</p>
+
             <p><b>White block</b> is a single-cell pattern that resolves
             whether a white circle goes horizontal or vertical by being next
             to a blocking edge.</p>
+            <div class="pattern" id="pattern_white_block"></div>
+
             <p><b>White line</b> is a single-cell pattern that simply
             continues a line that has entered a white circle, and blocks the
             other direction off.</p>
+            <div class="pattern" id="pattern_white_line"></div>
+
             <p><b>White turn</b> is a 3-by-1 pattern that blocks the edge
             that continues the line straight after the white circle, if
             the line before enters straight.</p>
+
             <p><b>Black block</b> are patterns that deny a block circle from
             continuing straight for two edges, either by lines from the side or
             blocking edges. This forces the black circle to do so in the
             opposite direction.</p>
+
             <p><b>Black line</b></p>
             <p><b>Three whites</b></p>
             <p><b>Two blacks</b></p>

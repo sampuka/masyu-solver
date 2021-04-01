@@ -1,8 +1,10 @@
+"use strict";
+
 class MasyuCanvas
 {
-    constructor()
+    constructor(canvas_id)
     {
-        this.cv = document.querySelector("canvas");
+        this.cv = document.getElementById(canvas_id);
         this.cx = this.cv.getContext("2d");
 
         // Grid style
