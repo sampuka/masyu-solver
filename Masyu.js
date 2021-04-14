@@ -63,6 +63,17 @@ class Masyu
         {
             let fos = fillinfo.split("/");
 
+            if (fos.length > 3)
+            {
+                console.log("Bad fillstring, too long!");
+                fos.length = 3;
+            }
+
+            while (fos.length < 3)
+            {
+                fos.push("");
+            }
+
             for (let fi = 0; fi < fos[0].length; fi++) // Faces
             {
                 let c = fos[0][fi];
@@ -78,7 +89,7 @@ class Masyu
                 }
             }
 
-            for (let vi = 0; vi < fos[1].length; vi++) // Faces
+            for (let vi = 0; vi < fos[1].length; vi++) // Vertices
             {
                 let c = fos[1][vi];
 
@@ -93,7 +104,7 @@ class Masyu
                 }
             }
 
-            for (let ei = 0; ei < fos[2].length; ei++) // Faces
+            for (let ei = 0; ei < fos[2].length; ei++) // Edges
             {
                 let c = fos[2][ei];
 
@@ -122,8 +133,10 @@ class Masyu
                 }
             }
         }
+    }
 
-        /*
+    initialize_borders()
+    {
         for (let x = 0; x < this.width; x++)
         {
             this.set_edge_below(x, -1, EdgeValue.cross);
@@ -135,7 +148,76 @@ class Masyu
             this.set_edge_right(-1, y, EdgeValue.cross);
             this.set_edge_right(this.width-1, y, EdgeValue.cross);
         }
-        */
+    }
+
+    solve_step()
+    {
+        this.find_pattern(1, 1, "w/..../c...", "w/..../ccll");
+    }
+
+    find_pattern(w, h, fillinfo1, fillinfo2)
+    {
+        let pattern = new Masyu(w, h, fillinfo1);
+
+        for (let x = 0; x < this.width-pattern.width+1; x++)
+        {
+            for (let y = 0; y < this.height-pattern.height+1; y++)
+            {
+                if (this.match_pattern(pattern, x, y))
+                {
+                    console.log("Found pattern on " + x + "," + y);
+                }
+            }
+        }
+    }
+
+    match_pattern(p, x, y)
+    {
+        let match_success = true;
+
+        for (let px = 0; px < p.width && match_success; px++)
+        {
+            for (let py = 0; py < p.height && match_success; py++)
+            {
+                if (p.get_face(px, py) != FaceType.blank)
+                {
+                    if (p.get_face(px, py) != this.get_face(px+x, py+y))
+                    {
+                        match_success = false;
+                    }
+                }
+            }
+        }
+
+        for (let px = 0; px < p.width && match_success; px++)
+        {
+            for (let py = -1; py < p.height && match_success; py++)
+            {
+                if (p.get_edge_below(px, py) != EdgeValue.unknown)
+                {
+                    if (p.get_edge_below(px, py) != this.get_edge_below(px+x, py+y))
+                    {
+                        match_success = false;
+                    }
+                }
+            }
+        }
+
+        for (let px = -1; px < p.width && match_success; px++)
+        {
+            for (let py = 0; py < p.height && match_success; py++)
+            {
+                if (p.get_edge_right(px, py) != EdgeValue.unknown)
+                {
+                    if (p.get_edge_right(px, py) != this.get_edge_right(px+x, py+y))
+                    {
+                        match_success = false;
+                    }
+                }
+            }
+        }
+
+        return match_success;
     }
 
     set_face(x, y, face_type)
@@ -150,6 +232,19 @@ class Masyu
         }
     }
 
+    get_face(x, y)
+    {
+        if (x < 0 || y < 0 || x >= this.width || y >= this.height)
+        {
+            console.log("Out-of-bounds in get_face!");
+            return FaceType.blank;
+        }
+        else
+        {
+            return this.faces[x + y*this.width].type;
+        }
+    }
+
     set_edge_right(x, y, edge_value)
     {
         this.ver_edges[x + y*(this.width+1)+1].value = edge_value;
@@ -158,6 +253,16 @@ class Masyu
     set_edge_below(x, y, edge_value)
     {
         this.hoz_edges[x + (y+1)*this.width].value = edge_value;
+    }
+
+    get_edge_right(x, y)
+    {
+        return this.ver_edges[x + y*(this.width+1)+1].value;
+    }
+
+    get_edge_below(x, y)
+    {
+        return this.hoz_edges[x + (y+1)*this.width].value;
     }
 
     draw_on(canvas)

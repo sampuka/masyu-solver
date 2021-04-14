@@ -1,9 +1,9 @@
 "use strict";
 
-let ms = new Masyu(10, 5);
-ms.set_face(2, 2, FaceType.black);
-ms.set_edge_below(1,1, EdgeValue.line);
-ms.set_edge_right(1,1, EdgeValue.cross);
+let ms = new Masyu(8, 7, ".w....w..b.bb.b....................ww....b....b.........");
+ms.initialize_borders();
+
+ms.solve_step();
 
 let cc = new MasyuCanvas("solver_masyu_canvas");
 ms.draw_on(cc);
