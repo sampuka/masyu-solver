@@ -3,7 +3,8 @@
 let ms = new Masyu(8, 7, ".w....w..b.bb.b....................ww....b....b.........");
 ms.initialize_borders();
 
-ms.solve_step();
+while(ms.solve_step())
+    ;
 
 let cc = new MasyuCanvas("solver_masyu_canvas");
 ms.draw_on(cc);
