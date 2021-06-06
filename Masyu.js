@@ -1,5 +1,3 @@
-"use strict";
-
 const FaceType = Object.freeze({"blank":1, "white":2, "black":3});
 const VertexSide = Object.freeze({"out":1, "in":2});
 const EdgeValue = Object.freeze({"unknown":1, "line":2, "cross":3});
@@ -33,7 +31,7 @@ class Masyu
         for (let f = 0; f < this.face_count; f++)
         {
             this.faces[f] = {};
-            this.faces[f].line_number = 0; // Face initialize to be part of no line
+            this.faces[f].line_number = 9999999; // Face initialize to be part of no line
             this.faces[f].type = FaceType.blank; // Faces initialize to blank face
         }
 
@@ -81,11 +79,13 @@ class Masyu
                 if (c == 'w')
                 {
                     this.faces[fi].type = FaceType.white;
+                    this.faces[fi].line_number = fi;
                 }
 
                 if (c == 'b')
                 {
                     this.faces[fi].type = FaceType.black;
+                    this.faces[fi].line_number = fi;
                 }
             }
 
@@ -135,6 +135,16 @@ class Masyu
         }
     }
 
+    segment_count()
+    {
+        let s = new Set();
+        for (let n = 0; n < this.face_count; n++)
+        {
+            s.add(this.faces[n].line_number);
+        }
+        return s.size;
+    }
+
     initialize_borders()
     {
         for (let x = 0; x < this.width; x++)
@@ -150,16 +160,153 @@ class Masyu
         }
     }
 
+    index_xy(n)
+    {
+        return [n%this.width, Math.floor(n/this.width)];
+    }
+
+    index_n(x, y)
+    {
+        return y*this.width + x;
+    }
+
+    update_state()
+    {
+        let changed = true;
+
+        while (changed)
+        {
+            changed = false;
+            for (let n = 0; n < this.face_count; n++)
+            {
+                let [x,y] = this.index_xy(n);
+                let num = this.faces[n].line_number;
+
+                if (this.get_edge_below(x,y-1) == EdgeValue.line)
+                {
+                    let num2 = this.faces[this.index_n(x,y-1)].line_number;
+                    if (num2 < num)
+                    {
+                        this.faces[n].line_number = num2;
+                        changed = true;
+                    }
+                    else if (num2 > num)
+                    {
+                        this.faces[this.index_n(x,y-1)].line_number = num;
+                        changed = true;
+                    }
+                }
+
+                if (this.get_edge_below(x,y) == EdgeValue.line)
+                {
+                    let num2 = this.faces[this.index_n(x,y+1)].line_number;
+                    if (num2 < num)
+                    {
+                        this.faces[n].line_number = num2;
+                        changed = true;
+                    }
+                    else if (num2 > num)
+                    {
+                        this.faces[this.index_n(x,y+1)].line_number = num;
+                        changed = true;
+                    }
+                }
+
+                if (this.get_edge_right(x-1,y) == EdgeValue.line)
+                {
+                    let num2 = this.faces[this.index_n(x-1,y)].line_number;
+                    if (num2 < num)
+                    {
+                        this.faces[n].line_number = num2;
+                        changed = true;
+                    }
+                    else if (num2 > num)
+                    {
+                        this.faces[this.index_n(x-1,y)].line_number = num;
+                        changed = true;
+                    }
+                }
+
+                if (this.get_edge_right(x,y) == EdgeValue.line)
+                {
+                    let num2 = this.faces[this.index_n(x+1,y)].line_number;
+                    if (num2 < num)
+                    {
+                        this.faces[n].line_number = num2;
+                        changed = true;
+                    }
+                    else if (num2 > num)
+                    {
+                        this.faces[this.index_n(x+1,y)].line_number = num;
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     solve_step()
     {
+        // Propagate blocks
+        if (this.find_pattern(1, 1, "./..../ccc.", "./..../cccc"))
+        {
+            return true;
+        }
+        if (this.find_pattern(1, 1, "./..../ll..", "./..../llcc"))
+        {
+            return true;
+        }
+        if (this.find_pattern(1, 1, "./..../l.l.", "./..../lclc"))
+        {
+            return true;
+        }
+
         // Resolve line end
         if (this.find_pattern(1, 1, "./..../c.lc", "./..../cllc"))
         {
             return true;
         }
+        if (this.find_pattern(1, 1, "./..../ccl.", "./..../ccll"))
+        {
+            return true;
+        }
+
+        // Avoid loop
+        if (this.segment_count() > 2)
+        {
+            for (let x = 0; x < this.width-1; x++)
+            {
+                for (let y = 0; y < this.height; y++)
+                {
+                    if (this.get_edge_right(x, y) == EdgeValue.unknown &&
+                        this.faces[this.index_n(x,y)].line_number != 9999999 &&
+                        this.faces[this.index_n(x,y)].line_number == this.faces[this.index_n(x+1,y)].line_number)
+                    {
+                        this.set_edge_right(x, y, EdgeValue.cross);
+                        return true;
+                    }
+                }
+            }
+        }
 
         // White block
         if (this.find_pattern(1, 1, "w/..../c...", "w/..../ccll"))
+        {
+            return true;
+        }
+
+        //Black block
+        if (this.find_pattern(3, 1, "b../......../......c...", "b../......../.c..c.cll."))
+        {
+            return true;
+        }
+        if (this.find_pattern(4, 1, ".b../........../l............", ".b../........../l.c...c..cll."))
+        {
+            return true;
+        }
+        if (this.find_pattern(4, 1, ".b../........../........c....", ".b../........../........ccll."))
         {
             return true;
         }
@@ -169,18 +316,21 @@ class Masyu
 
     find_pattern(w, h, fillinfo1, fillinfo2)
     {
-        let base_pattern = new Masyu(w, h, fillinfo1);
-        let base_res = new Masyu(w, h, fillinfo2);
+        let pattern = new Masyu(w, h, fillinfo1);
+        let res = new Masyu(w, h, fillinfo2);
 
-        for (let r = 0; r < 4; r++)
+        for (let r = 0; r < 8; r++)
         {
-            let pattern = Object.create(base_pattern);
-            let res = Object.create(base_res);
-
-            for (let i = 0; i < r; i++)
+            if (r > 0)
             {
                 pattern.rotate();
                 res.rotate();
+            }
+
+            if (r == 4)
+            {
+                pattern.flip();
+                res.flip();
             }
 
             for (let x = 0; x < this.width-pattern.width+1; x++)
@@ -190,6 +340,7 @@ class Masyu
                     if (this.match_pattern(pattern, x, y) && !this.match_pattern(res, x, y))
                     {
                         this.insert_pattern(res, x, y);
+                        console.log("Performed pattern at (" + String(x) + "," + String(y) + ")");
                         return true;
                     }
                 }
@@ -303,7 +454,7 @@ class Masyu
     {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height)
         {
-            console.log("Out-of-bounds in get_face!");
+            console.log("Out-of-bounds in get_face! (" + String(x) + "," + String(y) + ")");
             return FaceType.blank;
         }
         else
@@ -334,7 +485,72 @@ class Masyu
 
     rotate()
     {
-        let pre = Object.create(this);
+        let pre = _.cloneDeep(this);
+
+        this.height = pre.width;
+        this.width = pre.height;
+
+        this.hoz_edge_count = this.width*(this.height+1);
+        this.ver_edge_count = this.height*(this.width+1);
+
+        this.hoz_edges = _.cloneDeep(pre.ver_edges);
+        this.ver_edges = _.cloneDeep(pre.hoz_edges);
+
+        for (let x = 0; x < this.width; x++)
+        {
+            for (let y = 0; y < this.height; y++)
+            {
+                this.set_face(x, y, pre.get_face(y, pre.height-x-1));
+            }
+        }
+
+        for (let x = 0; x < this.width; x++)
+        {
+            for (let y = -1; y < this.height; y++)
+            {
+                this.set_edge_below(x, y, pre.get_edge_right(y, pre.height-x-1));
+            }
+        }
+
+        for (let x = -1; x < this.width; x++)
+        {
+            for (let y = 0; y < this.height; y++)
+            {
+                //console.log(String(y) + "," + String(pre.height-x-1));
+                this.set_edge_right(x, y, pre.get_edge_below(y, pre.height-x-2));
+            }
+        }
+    }
+
+    flip()
+    {
+        let pre = _.cloneDeep(this);
+
+        for (let x = 0; x < this.width; x++)
+        {
+            for (let y = 0; y < this.height; y++)
+            {
+                this.set_face(x, y, pre.get_face(x, pre.height-y-1));
+            }
+        }
+
+        for (let x = 0; x < this.width; x++)
+        {
+            for (let y = -1; y < this.height; y++)
+            {
+                //console.log(String(x) + "," + String(pre.height-y+1));
+                this.set_edge_below(x, y, pre.get_edge_below(x, pre.height-y-2));
+            }
+        }
+
+        for (let x = -1; x < this.width; x++)
+        {
+            for (let y = 0; y < this.height; y++)
+            {
+                //console.log(String(y) + "," + String(pre.height-x-1));
+                this.set_edge_right(x, y, pre.get_edge_right(x, pre.height-y-1));
+            }
+        }
     }
 
     draw_on(canvas)
