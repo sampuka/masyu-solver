@@ -1,4 +1,5 @@
-let ms = new Masyu(8, 7, ".w....w..b.bb.b....................ww....b....b.........");
+//let ms = new Masyu(8, 7, ".w....w..b.bb.b....................ww....b....b.........");
+let ms = new Masyu(15, 15, "...w....bwb.....w...b.....b..ww...w..w..w....w.ww..............b.w....w..b....w..ww.w..w.w.....ww.ww.w....wwb.b...w.........b...w...b...w.......w...ww...b...ww......b.....ww..w...b.w....w...w..w....b..w........b.......w..ww..");
 //let ms = new Masyu(6, 3, "......w....w....w.");
 let cc = new MasyuCanvas("solver_masyu_canvas");
 ms.initialize_borders();

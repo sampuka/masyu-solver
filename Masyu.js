@@ -289,6 +289,20 @@ class Masyu
                     }
                 }
             }
+
+            for (let x = 0; x < this.width; x++)
+            {
+                for (let y = 0; y < this.height-1; y++)
+                {
+                    if (this.get_edge_below(x, y) == EdgeValue.unknown &&
+                        this.faces[this.index_n(x,y)].line_number != 9999999 &&
+                        this.faces[this.index_n(x,y)].line_number == this.faces[this.index_n(x,y+1)].line_number)
+                    {
+                        this.set_edge_below(x, y, EdgeValue.cross);
+                        return true;
+                    }
+                }
+            }
         }
 
         // White block
@@ -297,7 +311,13 @@ class Masyu
             return true;
         }
 
-        //Black block
+        // White continuation
+        if (this.find_pattern(1, 1, "w/..../l...", "w/..../ll.."))
+        {
+            return true;
+        }
+
+        // Black block
         if (this.find_pattern(3, 1, "b../......../......c...", "b../......../.c..c.cll."))
         {
             return true;
@@ -307,6 +327,36 @@ class Masyu
             return true;
         }
         if (this.find_pattern(4, 1, ".b../........../........c....", ".b../........../........ccll."))
+        {
+            return true;
+        }
+
+        // Black continuation
+        if (this.find_pattern(3, 1, "b../......../.......l..", "b../......../.c..c.cll."))
+        {
+            return true;
+        }
+
+        // White hook
+        if (this.find_pattern(3, 1, ".w./......../.......lll", ".w./......../......clll"))
+        {
+            return true;
+        }
+
+        // Triplet white
+        if (this.find_pattern(3, 1, "www/......../..........", "www/......../llllll...."))
+        {
+            return true;
+        }
+
+        // White pointer
+        if (this.find_pattern(3, 1, ".ww/......../......l...", ".ww/......../.ll.lllccc"))
+        {
+            return true;
+        }
+
+        // White pincer
+        if (this.find_pattern(3, 1, ".w./......../......l..l", ".w./......../.l..l.lccl"))
         {
             return true;
         }
