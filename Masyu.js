@@ -152,23 +152,51 @@ class Masyu
 
     solve_step()
     {
-        this.find_pattern(1, 1, "w/..../c...", "w/..../ccll");
+        // Resolve line end
+        if (this.find_pattern(1, 1, "./..../c.lc", "./..../cllc"))
+        {
+            return true;
+        }
+
+        // White block
+        if (this.find_pattern(1, 1, "w/..../c...", "w/..../ccll"))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     find_pattern(w, h, fillinfo1, fillinfo2)
     {
-        let pattern = new Masyu(w, h, fillinfo1);
+        let base_pattern = new Masyu(w, h, fillinfo1);
+        let base_res = new Masyu(w, h, fillinfo2);
 
-        for (let x = 0; x < this.width-pattern.width+1; x++)
+        for (let r = 0; r < 4; r++)
         {
-            for (let y = 0; y < this.height-pattern.height+1; y++)
+            let pattern = Object.create(base_pattern);
+            let res = Object.create(base_res);
+
+            for (let i = 0; i < r; i++)
             {
-                if (this.match_pattern(pattern, x, y))
+                pattern.rotate();
+                res.rotate();
+            }
+
+            for (let x = 0; x < this.width-pattern.width+1; x++)
+            {
+                for (let y = 0; y < this.height-pattern.height+1; y++)
                 {
-                    console.log("Found pattern on " + x + "," + y);
+                    if (this.match_pattern(pattern, x, y) && !this.match_pattern(res, x, y))
+                    {
+                        this.insert_pattern(res, x, y);
+                        return true;
+                    }
                 }
             }
         }
+
+        return false;
     }
 
     match_pattern(p, x, y)
@@ -220,6 +248,45 @@ class Masyu
         return match_success;
     }
 
+    insert_pattern(p, x, y)
+    {
+        for (let px = 0; px < p.width; px++)
+        {
+            for (let py = 0; py < p.height; py++)
+            {
+                let f = p.get_face(px, py);
+                if (f != FaceType.blank)
+                {
+                    this.set_face(x+px, y+py, f);
+                }
+            }
+        }
+
+        for (let px = 0; px < p.width; px++)
+        {
+            for (let py = -1; py < p.height; py++)
+            {
+                let e = p.get_edge_below(px, py);
+                if (e != EdgeValue.unknown)
+                {
+                    this.set_edge_below(x+px, y+py, e);
+                }
+            }
+        }
+
+        for (let px = -1; px < p.width; px++)
+        {
+            for (let py = 0; py < p.height; py++)
+            {
+                let e = p.get_edge_right(px, py);
+                if (e != EdgeValue.unknown)
+                {
+                    this.set_edge_right(x+px, y+py, e);
+                }
+            }
+        }
+    }
+
     set_face(x, y, face_type)
     {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height)
@@ -263,6 +330,11 @@ class Masyu
     get_edge_below(x, y)
     {
         return this.hoz_edges[x + (y+1)*this.width].value;
+    }
+
+    rotate()
+    {
+        let pre = Object.create(this);
     }
 
     draw_on(canvas)
