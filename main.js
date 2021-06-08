@@ -3,9 +3,17 @@ let ms = new Masyu(15, 15, "...w....bwb.....w...b.....b..ww...w..w..w....w.ww...
 //let ms = new Masyu(6, 3, "......w....w....w.");
 let cc = new MasyuCanvas("solver_masyu_canvas");
 ms.initialize_borders();
+ms.draw_on(cc);
 
-while(ms.solve_step() && ms.update_state())
+//while(ms.solve_step() && ms.update_state())
+//    ms.draw_on(cc);
+
+function take_step()
+{
+    ms.solve_step();
+    ms.update_state();
     ms.draw_on(cc);
+}
 
 fill_pattern("propagate_blocks", 1, 1, "./..../cc.c", "./..../cccc");
 
