@@ -60,9 +60,31 @@
         <div id="masyu_interface_div">
             <canvas id="solver_masyu_canvas" width="0" height="0"></canvas>
             <div id="solver_steps_div">
-                <p>Resolve line end</p>
-                <p>Propagate blocks</p>
-                <p>Resolve dead end</p>
+                <button type="button" onclick="take_step();">Take step</button>
+                <table>
+                    <tr><td></td><td>Preliminary</td></tr>
+                    <tr><td><input type="checkbox" checked="checked" disabled="disabled"></input></td><td>Check if solved</td></tr>
+                    <tr><td><input type="checkbox" checked="checked" disabled="disabled"></input></td><td>Direct errors</td></tr>
+                    <tr><td><input type="checkbox" checked="checked" disabled="disabled"></input></td><td>Indirect errors</td></tr>
+                    <tr><td></td><td>Axiomatic</td></tr>
+                    <tr><td><input type="checkbox" checked="checked" disabled="disabled"></input></td><td>Propagate crosses</td></tr>
+                    <tr><td><input type="checkbox" checked="checked" disabled="disabled"></input></td><td>Extend lines</td></tr>
+                    <tr><td><input type="checkbox" checked="checked" disabled="disabled"></input></td><td>White circle</td></tr>
+                    <tr><td><input type="checkbox" checked="checked" disabled="disabled"></input></td><td>Black circle</td></tr>
+                    <tr><td></td><td>Easy</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Twin black</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Triplet white</td></tr>
+                    <tr><td></td><td>Medium</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Even ends</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Tunnel</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Bent needle</td></tr>
+                    <tr><td></td><td>Hard</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Area block</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Sphincter</td></tr>
+                    <tr><td></td><td>Trial-and-error</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Bifurcation</td></tr>
+                    <tr><td><input type="checkbox" checked="checked"></input></td><td>Double bifurcation</td></tr>
+                </table>
             </div>
         </div>
 
