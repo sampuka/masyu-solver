@@ -3,16 +3,60 @@ let ms = new Masyu(15, 15, "...w....bwb.....w...b.....b..ww...w..w..w....w.ww...
 //let ms = new Masyu(6, 3, "......w....w....w.");
 let cc = new MasyuCanvas("solver_masyu_canvas");
 ms.initialize_borders();
+ms.update_state();
 ms.draw_on(cc);
+
+let axi_steps = ["ProBl", "ExtLn", "WhiCl", "BlkCl", "AvdSl"];
+
+let esy_steps = ["TwnBl", "TrpWh", "WhiPt", "WhiPc"];
+
+let all_steps = axi_steps.concat(esy_steps);
 
 //while(ms.solve_step() && ms.update_state())
 //    ms.draw_on(cc);
 
 function take_step()
 {
-    ms.solve_step();
+    clear_table_styles();
+
+    let copy = _.cloneDeep(ms);
+    for (let i = 0; i < all_steps.length; i++)
+    {
+        let step_name = all_steps[i];
+        let tr = document.getElementById(step_name);
+        let chk = tr.children[0].children[0];
+        let txt = tr.children[1];
+
+        if (chk.checked)
+        {
+            if (copy["step_" + step_name]())
+            {
+                ms = copy;
+                txt.style.backgroundColor = "#88FF88";
+                break;
+            }
+            else
+            {
+                txt.style.backgroundColor = "#FF8888";
+            }
+        }
+    }
+
     ms.update_state();
     ms.draw_on(cc);
+}
+
+function clear_table_styles()
+{
+    for (let i = 0; i < all_steps.length; i++)
+    {
+        let step_name = all_steps[i];
+        let tr = document.getElementById(step_name);
+        let txt = tr.children[1];
+
+        txt.style.backgroundColor = "";
+    }
+
 }
 
 fill_pattern("propagate_blocks", 1, 1, "./..../cc.c", "./..../cccc");

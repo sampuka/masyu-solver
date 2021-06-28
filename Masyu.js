@@ -247,247 +247,6 @@ class Masyu
         return true;
     }
 
-    solve_step()
-    {
-        // Propagate blocks
-        if (this.find_pattern(1, 1, "./..../ccc.", "./..../cccc"))
-        {
-            return true;
-        }
-        if (this.find_pattern(1, 1, "./..../ll..", "./..../llcc"))
-        {
-            return true;
-        }
-        if (this.find_pattern(1, 1, "./..../l.l.", "./..../lclc"))
-        {
-            return true;
-        }
-
-        // Resolve line end
-        if (this.find_pattern(1, 1, "./..../c.lc", "./..../cllc"))
-        {
-            return true;
-        }
-        if (this.find_pattern(1, 1, "./..../ccl.", "./..../ccll"))
-        {
-            return true;
-        }
-
-        // Avoid loop
-        if (this.segment_count() > 2)
-        {
-            for (let x = 0; x < this.width-1; x++)
-            {
-                for (let y = 0; y < this.height; y++)
-                {
-                    if (this.get_edge_right(x, y) == EdgeValue.unknown &&
-                        this.faces[this.index_n(x,y)].line_number != 9999999 &&
-                        this.faces[this.index_n(x,y)].line_number == this.faces[this.index_n(x+1,y)].line_number)
-                    {
-                        this.set_edge_right(x, y, EdgeValue.cross);
-                        return true;
-                    }
-                }
-            }
-
-            for (let x = 0; x < this.width; x++)
-            {
-                for (let y = 0; y < this.height-1; y++)
-                {
-                    if (this.get_edge_below(x, y) == EdgeValue.unknown &&
-                        this.faces[this.index_n(x,y)].line_number != 9999999 &&
-                        this.faces[this.index_n(x,y)].line_number == this.faces[this.index_n(x,y+1)].line_number)
-                    {
-                        this.set_edge_below(x, y, EdgeValue.cross);
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // White block
-        if (this.find_pattern(1, 1, "w/..../c...", "w/..../ccll"))
-        {
-            return true;
-        }
-
-        // White continuation
-        if (this.find_pattern(1, 1, "w/..../l...", "w/..../ll.."))
-        {
-            return true;
-        }
-
-        // Black block
-        if (this.find_pattern(3, 1, "b../......../......c...", "b../......../.c..c.cll."))
-        {
-            return true;
-        }
-        if (this.find_pattern(4, 1, ".b../........../l............", ".b../........../l.c...c..cll."))
-        {
-            return true;
-        }
-        if (this.find_pattern(4, 1, ".b../........../........c....", ".b../........../........ccll."))
-        {
-            return true;
-        }
-
-        // Black continuation
-        if (this.find_pattern(3, 1, "b../......../.......l..", "b../......../.c..c.cll."))
-        {
-            return true;
-        }
-
-        // White hook
-        if (this.find_pattern(3, 1, ".w./......../.......lll", ".w./......../......clll"))
-        {
-            return true;
-        }
-
-        // Triplet white
-        if (this.find_pattern(3, 1, "www/......../..........", "www/......../llllll...."))
-        {
-            return true;
-        }
-
-        // White pointer
-        if (this.find_pattern(3, 1, ".ww/......../......l...", ".ww/......../.ll.lllccc"))
-        {
-            return true;
-        }
-
-        // White pincer
-        if (this.find_pattern(3, 1, ".w./......../......l..l", ".w./......../.l..l.lccl"))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    find_pattern(w, h, fillinfo1, fillinfo2)
-    {
-        let pattern = new Masyu(w, h, fillinfo1);
-        let res = new Masyu(w, h, fillinfo2);
-
-        for (let r = 0; r < 8; r++)
-        {
-            if (r > 0)
-            {
-                pattern.rotate();
-                res.rotate();
-            }
-
-            if (r == 4)
-            {
-                pattern.flip();
-                res.flip();
-            }
-
-            for (let x = 0; x < this.width-pattern.width+1; x++)
-            {
-                for (let y = 0; y < this.height-pattern.height+1; y++)
-                {
-                    if (this.match_pattern(pattern, x, y) && !this.match_pattern(res, x, y))
-                    {
-                        this.insert_pattern(res, x, y);
-                        console.log("Performed pattern at (" + String(x) + "," + String(y) + ")");
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    match_pattern(p, x, y)
-    {
-        let match_success = true;
-
-        for (let px = 0; px < p.width && match_success; px++)
-        {
-            for (let py = 0; py < p.height && match_success; py++)
-            {
-                if (p.get_face(px, py) != FaceType.blank)
-                {
-                    if (p.get_face(px, py) != this.get_face(px+x, py+y))
-                    {
-                        match_success = false;
-                    }
-                }
-            }
-        }
-
-        for (let px = 0; px < p.width && match_success; px++)
-        {
-            for (let py = -1; py < p.height && match_success; py++)
-            {
-                if (p.get_edge_below(px, py) != EdgeValue.unknown)
-                {
-                    if (p.get_edge_below(px, py) != this.get_edge_below(px+x, py+y))
-                    {
-                        match_success = false;
-                    }
-                }
-            }
-        }
-
-        for (let px = -1; px < p.width && match_success; px++)
-        {
-            for (let py = 0; py < p.height && match_success; py++)
-            {
-                if (p.get_edge_right(px, py) != EdgeValue.unknown)
-                {
-                    if (p.get_edge_right(px, py) != this.get_edge_right(px+x, py+y))
-                    {
-                        match_success = false;
-                    }
-                }
-            }
-        }
-
-        return match_success;
-    }
-
-    insert_pattern(p, x, y)
-    {
-        for (let px = 0; px < p.width; px++)
-        {
-            for (let py = 0; py < p.height; py++)
-            {
-                let f = p.get_face(px, py);
-                if (f != FaceType.blank)
-                {
-                    this.set_face(x+px, y+py, f);
-                }
-            }
-        }
-
-        for (let px = 0; px < p.width; px++)
-        {
-            for (let py = -1; py < p.height; py++)
-            {
-                let e = p.get_edge_below(px, py);
-                if (e != EdgeValue.unknown)
-                {
-                    this.set_edge_below(x+px, y+py, e);
-                }
-            }
-        }
-
-        for (let px = -1; px < p.width; px++)
-        {
-            for (let py = 0; py < p.height; py++)
-            {
-                let e = p.get_edge_right(px, py);
-                if (e != EdgeValue.unknown)
-                {
-                    this.set_edge_right(x+px, y+py, e);
-                }
-            }
-        }
-    }
-
     set_face(x, y, face_type)
     {
         if (x < 0 || y < 0 || x >= this.width || y >= this.height)
@@ -662,5 +421,286 @@ class Masyu
                 canvas.draw_edge_cross_right(x,y);
             }
         }
+    }
+
+    find_pattern(w, h, fillinfo1, fillinfo2)
+    {
+        let pattern = new Masyu(w, h, fillinfo1);
+        let res = new Masyu(w, h, fillinfo2);
+
+        for (let r = 0; r < 8; r++)
+        {
+            if (r > 0)
+            {
+                pattern.rotate();
+                res.rotate();
+            }
+
+            if (r == 4)
+            {
+                pattern.flip();
+                res.flip();
+            }
+
+            for (let x = 0; x < this.width-pattern.width+1; x++)
+            {
+                for (let y = 0; y < this.height-pattern.height+1; y++)
+                {
+                    if (this.match_pattern(pattern, x, y) && !this.match_pattern(res, x, y))
+                    {
+                        this.insert_pattern(res, x, y);
+                        console.log("Performed pattern at (" + String(x) + "," + String(y) + ")");
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    match_pattern(p, x, y)
+    {
+        let match_success = true;
+
+        for (let px = 0; px < p.width && match_success; px++)
+        {
+            for (let py = 0; py < p.height && match_success; py++)
+            {
+                if (p.get_face(px, py) != FaceType.blank)
+                {
+                    if (p.get_face(px, py) != this.get_face(px+x, py+y))
+                    {
+                        match_success = false;
+                    }
+                }
+            }
+        }
+
+        for (let px = 0; px < p.width && match_success; px++)
+        {
+            for (let py = -1; py < p.height && match_success; py++)
+            {
+                if (p.get_edge_below(px, py) != EdgeValue.unknown)
+                {
+                    if (p.get_edge_below(px, py) != this.get_edge_below(px+x, py+y))
+                    {
+                        match_success = false;
+                    }
+                }
+            }
+        }
+
+        for (let px = -1; px < p.width && match_success; px++)
+        {
+            for (let py = 0; py < p.height && match_success; py++)
+            {
+                if (p.get_edge_right(px, py) != EdgeValue.unknown)
+                {
+                    if (p.get_edge_right(px, py) != this.get_edge_right(px+x, py+y))
+                    {
+                        match_success = false;
+                    }
+                }
+            }
+        }
+
+        return match_success;
+    }
+
+    insert_pattern(p, x, y)
+    {
+        for (let px = 0; px < p.width; px++)
+        {
+            for (let py = 0; py < p.height; py++)
+            {
+                let f = p.get_face(px, py);
+                if (f != FaceType.blank)
+                {
+                    this.set_face(x+px, y+py, f);
+                }
+            }
+        }
+
+        for (let px = 0; px < p.width; px++)
+        {
+            for (let py = -1; py < p.height; py++)
+            {
+                let e = p.get_edge_below(px, py);
+                if (e != EdgeValue.unknown)
+                {
+                    this.set_edge_below(x+px, y+py, e);
+                }
+            }
+        }
+
+        for (let px = -1; px < p.width; px++)
+        {
+            for (let py = 0; py < p.height; py++)
+            {
+                let e = p.get_edge_right(px, py);
+                if (e != EdgeValue.unknown)
+                {
+                    this.set_edge_right(x+px, y+py, e);
+                }
+            }
+        }
+    }
+
+    step_ProBl() // Propagate blocks
+    {
+        if (this.find_pattern(1, 1, "./..../ccc.", "./..../cccc"))
+        {
+            return true;
+        }
+        if (this.find_pattern(1, 1, "./..../ll..", "./..../llcc"))
+        {
+            return true;
+        }
+        if (this.find_pattern(1, 1, "./..../l.l.", "./..../lclc"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    step_ExtLn() // Extend lines
+    {
+        if (this.find_pattern(1, 1, "./..../c.lc", "./..../cllc"))
+        {
+            return true;
+        }
+        if (this.find_pattern(1, 1, "./..../ccl.", "./..../ccll"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    step_AvdSl() // Avoid subloops
+    {
+        if (this.segment_count() > 2)
+        {
+            for (let x = 0; x < this.width-1; x++)
+            {
+                for (let y = 0; y < this.height; y++)
+                {
+                    if (this.get_edge_right(x, y) == EdgeValue.unknown &&
+                        this.faces[this.index_n(x,y)].line_number != 9999999 &&
+                        this.faces[this.index_n(x,y)].line_number == this.faces[this.index_n(x+1,y)].line_number)
+                    {
+                        this.set_edge_right(x, y, EdgeValue.cross);
+                        return true;
+                    }
+                }
+            }
+
+            for (let x = 0; x < this.width; x++)
+            {
+                for (let y = 0; y < this.height-1; y++)
+                {
+                    if (this.get_edge_below(x, y) == EdgeValue.unknown &&
+                        this.faces[this.index_n(x,y)].line_number != 9999999 &&
+                        this.faces[this.index_n(x,y)].line_number == this.faces[this.index_n(x,y+1)].line_number)
+                    {
+                        this.set_edge_below(x, y, EdgeValue.cross);
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    step_WhiCl() // White circle axiomatics
+    {
+        // White block
+        if (this.find_pattern(1, 1, "w/..../c...", "w/..../ccll"))
+        {
+            return true;
+        }
+
+        // White continuation
+        if (this.find_pattern(1, 1, "w/..../l...", "w/..../ll.."))
+        {
+            return true;
+        }
+
+        // White hook
+        if (this.find_pattern(3, 1, ".w./......../.......lll", ".w./......../......clll"))
+        {
+            return true;
+        }
+
+
+        return false;
+    }
+
+    step_BlkCl() // Black circle axiomatics
+    {
+        // Black block
+        if (this.find_pattern(3, 1, "b../......../......c...", "b../......../.c..c.cll."))
+        {
+            return true;
+        }
+        if (this.find_pattern(4, 1, ".b../........../l............", ".b../........../l.c...c..cll."))
+        {
+            return true;
+        }
+        if (this.find_pattern(4, 1, ".b../........../........c....", ".b../........../........ccll."))
+        {
+            return true;
+        }
+
+        // Black continuation
+        if (this.find_pattern(3, 1, "b../......../.......l..", "b../......../.c..c.cll."))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    step_TwnBl() // Twin black
+    {
+        if (this.find_pattern(4, 1, "..bb../......../.............", "..bb../......../c..cc..cll.ll"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    step_TrpWh() // Triplet white
+    {
+        if (this.find_pattern(3, 1, "www/......../..........", "www/......../llllll...."))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    step_WhiPt() // White pointer
+    {
+        if (this.find_pattern(3, 1, ".ww/......../......l...", ".ww/......../.ll.lllccc"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    step_WhiPc() // White pincer
+    {
+        if (this.find_pattern(3, 1, ".w./......../......l..l", ".w./......../.l..l.lccl"))
+        {
+            return true;
+        }
+
+        return false;
     }
 }
