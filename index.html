@@ -22,6 +22,10 @@
             vertical-align: top;
         }
 
+        .stepbtn {
+            display: inline-block;
+        }
+
         #guide_div {
             margin: 0px auto;
             max-width: 700px;
@@ -60,7 +64,8 @@
         <div id="masyu_interface_div">
             <canvas id="solver_masyu_canvas" width="0" height="0"></canvas>
             <div id="solver_steps_div">
-                <button type="button" onclick="take_step();">Take step</button>
+                <button class="stepbtn" type="button" onclick="take_step();">Take step</button>
+                <button class="stepbtn" type="button" onclick="take_big_step();">Big step</button>
                 <table>
                     <tr><td></td><td>Preliminary</td></tr>
                     <tr><td><input type="checkbox" checked="checked" disabled="disabled"></input></td><td>Check if solved</td></tr>
@@ -75,10 +80,10 @@
                     <tr><td></td><td>Easy</td></tr>
                     <tr id="TwnBl"><td><input type="checkbox" checked="checked"></input></td><td>Twin black</td></tr>
                     <tr id="TrpWh"><td><input type="checkbox" checked="checked"></input></td><td>Triplet white</td></tr>
-                    <tr id="WhiPt"><td><input type="checkbox" checked="checked"></input></td><td>WhitePt</td></tr>
-                    <tr id="WhiPc"><td><input type="checkbox" checked="checked"></input></td><td>WhitePc</td></tr>
+                    <tr id="WhiPt"><td><input type="checkbox" checked="checked"></input></td><td>White pointer</td></tr>
+                    <tr id="WhiPc"><td><input type="checkbox" checked="checked"></input></td><td>White pincer</td></tr>
                     <tr><td></td><td>Medium</td></tr>
-                    <tr id="VrtPr"><td><input type="checkbox" checked="checked"></input></td><td>Vertex Parity</td></tr>
+                    <tr id="VtxPr"><td><input type="checkbox" checked="checked"></input></td><td>Vertex parity</td></tr>
                     <tr id="Tunnl"><td><input type="checkbox" checked="checked"></input></td><td>Tunnel</td></tr>
                     <tr id="BntNd"><td><input type="checkbox" checked="checked"></input></td><td>Bent needle</td></tr>
                     <tr><td></td><td>Hard</td></tr>
