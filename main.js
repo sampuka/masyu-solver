@@ -10,7 +10,9 @@ let axi_steps = ["ProBl", "ExtLn", "WhiCl", "BlkCl", "AvdSl"];
 
 let esy_steps = ["TwnBl", "TrpWh", "WhiPt", "WhiPc"];
 
-let all_steps = axi_steps.concat(esy_steps);
+let med_steps = ["VtxPr"];
+
+let all_steps = axi_steps.concat(esy_steps.concat(med_steps));
 
 //while(ms.solve_step() && ms.update_state())
 //    ms.draw_on(cc);
@@ -44,6 +46,50 @@ function take_step()
 
     ms.update_state();
     ms.draw_on(cc);
+}
+
+function take_big_step()
+{
+    clear_table_styles();
+
+    let found_axi = false;
+    let updated = true;
+
+    let copy = _.cloneDeep(ms);
+    while (updated)
+    {
+        updated = false;
+        for (let i = 0; i < axi_steps.length; i++)
+        {
+            let step_name = axi_steps[i];
+            let tr = document.getElementById(step_name);
+            let chk = tr.children[0].children[0];
+            let txt = tr.children[1];
+
+            if (chk.checked)
+            {
+                if (copy["step_" + step_name]())
+                {
+                    txt.style.backgroundColor = "#88FF88";
+                    found_axi = true;
+                    updated = true;
+                    copy.update_state();
+                    break;
+                }
+            }
+        }
+    }
+
+    if (found_axi)
+    {
+        ms = copy;
+        ms.update_state();
+        ms.draw_on(cc);
+    }
+    else
+    {
+        take_step();
+    }
 }
 
 function clear_table_styles()

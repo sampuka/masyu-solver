@@ -170,6 +170,16 @@ class Masyu
         return y*this.width + x;
     }
 
+    index_xy_vertex(n)
+    {
+        return [n%(this.width+1), Math.floor(n/(this.width+1))];
+    }
+
+    index_n_vertex(x, y)
+    {
+        return y*(this.width+1) + x;
+    }
+
     update_state()
     {
         let changed = true;
@@ -244,7 +254,73 @@ class Masyu
             }
         }
 
+        changed = true;
+
+        while (changed)
+        {
+            changed = false;
+
+            for (let n = 0; n < this.vertex_count; n++)
+            {
+                let [x,y] = this.index_xy_vertex(n);
+                let g = this.vertices[n].group;
+                let s = this.vertices[n].side;
+
+                let n2 = this.index_n_vertex(x,y-1);
+
+                if (y > 0 && this.vertices[n2].group != g)
+                {
+                    let e = this.get_edge_right(x-1,y-1);
+                    if (e != EdgeValue.unknown)
+                    {
+                        let opposite = (this.vertices[n2].side != s) ^ (e == EdgeValue.line);
+                        this.unite_vertex_groups(g, this.vertices[n2].group, opposite);
+                        changed = true;
+                    }
+                }
+
+                n2 = this.index_n_vertex(x-1,y);
+
+                if (x > 0 && this.vertices[n2].group != g)
+                {
+                    let e = this.get_edge_below(x-1,y-1);
+                    if (e != EdgeValue.unknown)
+                    {
+                        let opposite = (this.vertices[n2].side != s) ^ (e == EdgeValue.line);
+                        this.unite_vertex_groups(g, this.vertices[n2].group, opposite);
+                        changed = true;
+                    }
+                }
+            }
+        }
+
         return true;
+    }
+
+    unite_vertex_groups(g1, g2, opposite)
+    {
+        for (let n = 0; n < this.vertex_count; n++)
+        {
+            if (this.vertices[n].group == g2)
+            {
+                let new_s = this.vertices[n].side;
+
+                if (opposite)
+                {
+                    if (new_s == VertexSide.in)
+                    {
+                        new_s = VertexSide.out;
+                    }
+                    else
+                    {
+                        new_s = VertexSide.in;
+                    }
+                }
+
+                this.vertices[n].group = g1;
+                this.vertices[n].side = new_s;
+            }
+        }
     }
 
     set_face(x, y, face_type)
@@ -699,6 +775,58 @@ class Masyu
         if (this.find_pattern(3, 1, ".w./......../......l..l", ".w./......../.l..l.lccl"))
         {
             return true;
+        }
+
+        return false;
+    }
+
+    step_VtxPr() // Vertex parity
+    {
+        for (let n = 0; n < this.vertex_count; n++)
+        {
+            let [x,y] = this.index_xy_vertex(n);
+            let g = this.vertices[n].group;
+            let s = this.vertices[n].side;
+
+            let n2 = this.index_n_vertex(x,y-1);
+
+            if (y > 0 && this.vertices[n2].group == g)
+            {
+                let e = this.get_edge_right(x-1,y-1);
+                if (e == EdgeValue.unknown)
+                {
+                    if (this.vertices[n2].side == s)
+                    {
+                        this.set_edge_right(x-1,y-1,EdgeValue.cross);
+                    }
+                    else
+                    {
+                        this.set_edge_right(x-1,y-1,EdgeValue.line);
+                    }
+
+                    return true;
+                }
+            }
+
+            n2 = this.index_n_vertex(x-1,y);
+
+            if (x > 0 && this.vertices[n2].group == g)
+            {
+                let e = this.get_edge_below(x-1,y-1);
+                if (e == EdgeValue.unknown)
+                {
+                    if (this.vertices[n2].side == s)
+                    {
+                        this.set_edge_below(x-1,y-1,EdgeValue.cross);
+                    }
+                    else
+                    {
+                        this.set_edge_below(x-1,y-1,EdgeValue.line);
+                    }
+
+                    return true;
+                }
+            }
         }
 
         return false;
