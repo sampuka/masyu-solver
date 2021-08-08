@@ -17,9 +17,26 @@ let all_steps = axi_steps.concat(esy_steps.concat(med_steps));
 //while(ms.solve_step() && ms.update_state())
 //    ms.draw_on(cc);
 
-function take_step()
+function pre_step()
 {
     clear_table_styles();
+
+    if (ms.is_solved())
+    {
+        let tr = document.getElementById("CkSlv");
+        let chk = tr.children[0].children[0];
+        let txt = tr.children[1];
+        txt.style.backgroundColor = "#88FF88";
+        return true;
+    }
+}
+
+function take_step()
+{
+    if (pre_step())
+    {
+        return;
+    }
 
     let copy = _.cloneDeep(ms);
     for (let i = 0; i < all_steps.length; i++)
@@ -50,7 +67,10 @@ function take_step()
 
 function take_big_step()
 {
-    clear_table_styles();
+    if (pre_step())
+    {
+        return;
+    }
 
     let found_axi = false;
     let updated = true;

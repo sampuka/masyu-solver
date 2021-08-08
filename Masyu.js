@@ -140,7 +140,10 @@ class Masyu
         let s = new Set();
         for (let n = 0; n < this.face_count; n++)
         {
-            s.add(this.faces[n].line_number);
+            if (this.faces[n].line_number != 9999999)
+            {
+                s.add(this.faces[n].line_number);
+            }
         }
         return s.size;
     }
@@ -623,6 +626,22 @@ class Masyu
         }
     }
 
+    is_solved()
+    {
+        if (this.segment_count() != 1)
+        {
+            return false;
+        }
+
+        if (this.find_pattern(1, 1, "./..../c.lc", "./..../...."))
+        {
+            return false;
+        }
+
+        return true;
+
+    }
+
     step_ProBl() // Propagate blocks
     {
         if (this.find_pattern(1, 1, "./..../ccc.", "./..../cccc"))
@@ -657,7 +676,7 @@ class Masyu
 
     step_AvdSl() // Avoid subloops
     {
-        if (this.segment_count() > 2)
+        if (this.segment_count() > 1)
         {
             for (let x = 0; x < this.width-1; x++)
             {
