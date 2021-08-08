@@ -502,7 +502,42 @@ class Masyu
         }
     }
 
-    find_pattern(w, h, fillinfo1, fillinfo2)
+    /*
+    find_pattern(w, h, fillinfo1)
+    {
+        let pattern = new Masyu(w, h, fillinfo1);
+
+        for (let r = 0; r < 8; r++)
+        {
+            if (r > 0)
+            {
+                pattern.rotate();
+                res.rotate();
+            }
+
+            if (r == 4)
+            {
+                pattern.flip();
+                res.flip();
+            }
+
+            for (let x = 0; x < this.width-pattern.width+1; x++)
+            {
+                for (let y = 0; y < this.height-pattern.height+1; y++)
+                {
+                    if (this.match_pattern(pattern, x, y))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+    */
+
+    find_replace_pattern(w, h, fillinfo1, fillinfo2)
     {
         let pattern = new Masyu(w, h, fillinfo1);
         let res = new Masyu(w, h, fillinfo2);
@@ -528,7 +563,7 @@ class Masyu
                     if (this.match_pattern(pattern, x, y) && !this.match_pattern(res, x, y))
                     {
                         this.insert_pattern(res, x, y);
-                        console.log("Performed pattern at (" + String(x) + "," + String(y) + ")");
+                        //console.log("Performed pattern at (" + String(x) + "," + String(y) + ")");
                         return true;
                     }
                 }
@@ -633,26 +668,60 @@ class Masyu
             return false;
         }
 
-        if (this.find_pattern(1, 1, "./..../c.lc", "./..../...."))
+        for (let n = 0; n < this.face_count; n++)
         {
-            return false;
+            let [x,y] = this.index_xy(n);
+
+            let line_edges = 0;
+
+            if (this.get_edge_below(x,y-1) == EdgeValue.line)
+            {
+                line_edges++;
+            }
+            if (this.get_edge_below(x,y) == EdgeValue.line)
+            {
+                line_edges++;
+            }
+            if (this.get_edge_right(x-1,y) == EdgeValue.line)
+            {
+                line_edges++;
+            }
+            if (this.get_edge_right(x,y) == EdgeValue.line)
+            {
+                line_edges++;
+            }
+
+            if (line_edges%2 != 0)
+            {
+                return false;
+            }
         }
 
         return true;
 
     }
 
+    direct_error()
+    {
+        return false;
+    }
+
+    indirect_error()
+    {
+        return false;
+    }
+
     step_ProBl() // Propagate blocks
     {
-        if (this.find_pattern(1, 1, "./..../ccc.", "./..../cccc"))
+        if (this.find_replace_pattern(1, 1, "./..../ccc.", "./..../cccc"))
         {
             return true;
         }
-        if (this.find_pattern(1, 1, "./..../ll..", "./..../llcc"))
+        if (this.find_replace_pattern(1, 1, "./..../ll..", "./..../llcc"))
         {
             return true;
         }
-        if (this.find_pattern(1, 1, "./..../l.l.", "./..../lclc"))
+        if (this.find_replace_pattern(1, 1, "./..../l.l.", "./..../lclc"))
         {
             return true;
         }
@@ -662,11 +731,11 @@ class Masyu
 
     step_ExtLn() // Extend lines
     {
-        if (this.find_pattern(1, 1, "./..../c.lc", "./..../cllc"))
+        if (this.find_replace_pattern(1, 1, "./..../c.lc", "./..../cllc"))
         {
             return true;
         }
-        if (this.find_pattern(1, 1, "./..../ccl.", "./..../ccll"))
+        if (this.find_replace_pattern(1, 1, "./..../ccl.", "./..../ccll"))
         {
             return true;
         }
@@ -713,19 +782,19 @@ class Masyu
     step_WhiCl() // White circle axiomatics
     {
         // White block
-        if (this.find_pattern(1, 1, "w/..../c...", "w/..../ccll"))
+        if (this.find_replace_pattern(1, 1, "w/..../c...", "w/..../ccll"))
         {
             return true;
         }
 
         // White continuation
-        if (this.find_pattern(1, 1, "w/..../l...", "w/..../ll.."))
+        if (this.find_replace_pattern(1, 1, "w/..../l...", "w/..../ll.."))
         {
             return true;
         }
 
         // White hook
-        if (this.find_pattern(3, 1, ".w./......../.......lll", ".w./......../......clll"))
+        if (this.find_replace_pattern(3, 1, ".w./......../.......lll", ".w./......../......clll"))
         {
             return true;
         }
@@ -737,21 +806,21 @@ class Masyu
     step_BlkCl() // Black circle axiomatics
     {
         // Black block
-        if (this.find_pattern(3, 1, "b../......../......c...", "b../......../.c..c.cll."))
+        if (this.find_replace_pattern(3, 1, "b../......../......c...", "b../......../.c..c.cll."))
         {
             return true;
         }
-        if (this.find_pattern(4, 1, ".b../........../l............", ".b../........../l.c...c..cll."))
+        if (this.find_replace_pattern(4, 1, ".b../........../l............", ".b../........../l.c...c..cll."))
         {
             return true;
         }
-        if (this.find_pattern(4, 1, ".b../........../........c....", ".b../........../........ccll."))
+        if (this.find_replace_pattern(4, 1, ".b../........../........c....", ".b../........../........ccll."))
         {
             return true;
         }
 
         // Black continuation
-        if (this.find_pattern(3, 1, "b../......../.......l..", "b../......../.c..c.cll."))
+        if (this.find_replace_pattern(3, 1, "b../......../.......l..", "b../......../.c..c.cll."))
         {
             return true;
         }
@@ -761,7 +830,7 @@ class Masyu
 
     step_TwnBl() // Twin black
     {
-        if (this.find_pattern(4, 1, "..bb../......../.............", "..bb../......../c..cc..cll.ll"))
+        if (this.find_replace_pattern(4, 1, "..bb../......../.............", "..bb../......../c..cc..cll.ll"))
         {
             return true;
         }
@@ -771,7 +840,7 @@ class Masyu
 
     step_TrpWh() // Triplet white
     {
-        if (this.find_pattern(3, 1, "www/......../..........", "www/......../llllll...."))
+        if (this.find_replace_pattern(3, 1, "www/......../..........", "www/......../llllll...."))
         {
             return true;
         }
@@ -781,7 +850,7 @@ class Masyu
 
     step_WhiPt() // White pointer
     {
-        if (this.find_pattern(3, 1, ".ww/......../......l...", ".ww/......../.ll.lllccc"))
+        if (this.find_replace_pattern(3, 1, ".ww/......../......l...", ".ww/......../.ll.lllccc"))
         {
             return true;
         }
@@ -791,7 +860,7 @@ class Masyu
 
     step_WhiPc() // White pincer
     {
-        if (this.find_pattern(3, 1, ".w./......../......l..l", ".w./......../.l..l.lccl"))
+        if (this.find_replace_pattern(3, 1, ".w./......../......l..l", ".w./......../.l..l.lccl"))
         {
             return true;
         }

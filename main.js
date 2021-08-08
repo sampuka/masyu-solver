@@ -14,6 +14,8 @@ let med_steps = ["VtxPr"];
 
 let all_steps = axi_steps.concat(esy_steps.concat(med_steps));
 
+let all_entries = all_steps.concat(["CkSlv", "DrErr", "InErr"]);
+
 //while(ms.solve_step() && ms.update_state())
 //    ms.draw_on(cc);
 
@@ -29,14 +31,34 @@ function pre_step()
         txt.style.backgroundColor = "#88FF88";
         return true;
     }
+
+    if (ms.direct_error())
+    {
+        let tr = document.getElementById("DrErr");
+        let chk = tr.children[0].children[0];
+        let txt = tr.children[1];
+        txt.style.backgroundColor = "#FF8888";
+        return true;
+    }
+
+    if (ms.indirect_error())
+    {
+        let tr = document.getElementById("InErr");
+        let chk = tr.children[0].children[0];
+        let txt = tr.children[1];
+        txt.style.backgroundColor = "#FF8888";
+        return true;
+    }
 }
 
 function take_step()
 {
     if (pre_step())
     {
-        return;
+        return false;
     }
+
+    let found_a_step = false;
 
     let copy = _.cloneDeep(ms);
     for (let i = 0; i < all_steps.length; i++)
@@ -50,6 +72,7 @@ function take_step()
         {
             if (copy["step_" + step_name]())
             {
+                found_a_step = true;
                 ms = copy;
                 txt.style.backgroundColor = "#88FF88";
                 break;
@@ -61,15 +84,29 @@ function take_step()
         }
     }
 
-    ms.update_state();
-    ms.draw_on(cc);
+    if (found_a_step)
+    {
+        ms.update_state();
+        ms.draw_on(cc);
+        return true;
+    }
+
+    return false;
+}
+
+function attempt_solve()
+{
+    while (take_step())
+    {
+        ;
+    }
 }
 
 function take_big_step()
 {
     if (pre_step())
     {
-        return;
+        return false;
     }
 
     let found_axi = false;
@@ -105,10 +142,11 @@ function take_big_step()
         ms = copy;
         ms.update_state();
         ms.draw_on(cc);
+        return true;
     }
     else
     {
-        take_step();
+        return take_step();
     }
 }
 
