@@ -1,4 +1,6 @@
 # masyu-solver
 Intention is to create something similar to Andrew Stuart's Sudoku Solver, but for Masyu.
 
-Current state: Good background for further development, handful of techniques already implemented.
+Hosted on sampuka.github.io/masyu-solver. Press any of the three buttons top-right and refresh to clear puzzle.
+
+Currently on hiatus.
